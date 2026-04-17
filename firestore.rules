@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: books
+    // Fields:
+    //   - title: string (required, 1-200 chars)
+    //   - author: string (optional, 0-100 chars)
+    //   - coverUrl: string (optional, valid URL or data URL)
+    //   - totalChapters: number (required, >= 1)
+    //   - userId: string (required, matches auth.uid)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: chapters
+    // Fields:
+    //   - bookId: string (required, references a book)
+    //   - title: string (required, 1-200 chars)
+    //   - mindMap: string (required, JSON string, max 1MB)
+    //   - userId: string (required, matches auth.uid)
+    //   - createdAt: timestamp (required)
+    //
+    // Collection: reviews
+    // Fields:
+    //   - chapterId: string (required, references a chapter)
+    //   - userId: string (required, matches auth.uid)
+    //   - nextReviewDate: timestamp (required)
+    //   - interval: number (required, >= 0)
+    //   - easeFactor: number (required, >= 1.3)
+    //   - lastReviewedAt: timestamp (optional)
+    //   - status: string (required, enum: ['new', 'learning', 'review'])
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.userId;
+    }
+
+    function isValidImageUrl(url) {
+      return url is string && (url == "" || url.matches("^https://.*") || url.matches("^http://.*") || url.matches("^data:image/.*"));
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    function isValidBook(data) {
+      return data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             (!('author' in data) || (data.author is string && data.author.size() <= 100)) &&
+             (!('coverUrl' in data) || isValidImageUrl(data.coverUrl)) &&
+             data.totalChapters is number && data.totalChapters >= 1 &&
+             data.userId == request.auth.uid &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidChapter(data) {
+      return data.bookId is string &&
+             data.title is string && data.title.size() >= 1 && data.title.size() <= 200 &&
+             data.mindMap is string && data.mindMap.size() <= 1048576 && // 1MB
+             data.userId == request.auth.uid &&
+             data.createdAt is timestamp;
+    }
+
+    function isValidReview(data) {
+      return data.chapterId is string &&
+             data.userId == request.auth.uid &&
+             data.nextReviewDate is timestamp &&
+             data.interval is number && data.interval >= 0 &&
+             data.easeFactor is number && data.easeFactor >= 1.3 &&
+             (!('lastReviewedAt' in data) || data.lastReviewedAt is timestamp) &&
+             data.status in ['new', 'learning', 'review'];
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /books/{bookId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidBook(request.resource.data) && hasOnlyAllowedFields(['title', 'author', 'coverUrl', 'totalChapters', 'userId', 'createdAt']);
+      allow update: if isDocOwner() && isValidBook(request.resource.data) && hasOnlyAllowedFields(['title', 'author', 'coverUrl', 'totalChapters', 'userId', 'createdAt']);
+      allow delete: if isDocOwner();
+    }
+
+    match /chapters/{chapterId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidChapter(request.resource.data) && hasOnlyAllowedFields(['bookId', 'title', 'mindMap', 'userId', 'createdAt']);
+      allow update: if isDocOwner() && isValidChapter(request.resource.data) && hasOnlyAllowedFields(['bookId', 'title', 'mindMap', 'userId', 'createdAt']);
+      allow delete: if isDocOwner();
+    }
+
+    match /reviews/{reviewId} {
+      allow read: if isDocOwner();
+      allow create: if isAuthenticated() && isValidReview(request.resource.data) && hasOnlyAllowedFields(['chapterId', 'userId', 'nextReviewDate', 'interval', 'easeFactor', 'lastReviewedAt', 'status']);
+      allow update: if isDocOwner() && isValidReview(request.resource.data) && hasOnlyAllowedFields(['chapterId', 'userId', 'nextReviewDate', 'interval', 'easeFactor', 'lastReviewedAt', 'status']);
+      allow delete: if isDocOwner();
+    }
+  }
+}

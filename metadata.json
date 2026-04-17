@@ -1,0 +1,6 @@
+{
+  "name": "MindShelf",
+  "description": "A smart knowledge management app to store books, build mind maps for chapters, and master content using spaced repetition.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

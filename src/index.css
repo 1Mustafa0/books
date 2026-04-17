@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+    --font-heading: 'Outfit', sans-serif;
+    --font-sans: 'Geist Variable', sans-serif;
+    --color-sidebar-ring: var(--sidebar-ring);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar: var(--sidebar);
+    --color-chart-5: var(--chart-5);
+    --color-chart-4: var(--chart-4);
+    --color-chart-3: var(--chart-3);
+    --color-chart-2: var(--chart-2);
+    --color-chart-1: var(--chart-1);
+    --color-ring: var(--ring);
+    --color-input: var(--input);
+    --color-border: var(--border);
+    --color-destructive: var(--destructive);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-accent: var(--accent);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-muted: var(--muted);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-secondary: var(--secondary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-primary: var(--primary);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-popover: var(--popover);
+    --color-card-foreground: var(--card-foreground);
+    --color-card: var(--card);
+    --color-foreground: var(--foreground);
+    --color-background: var(--background);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+    --background: #050609;
+    --foreground: #F8F9FA;
+    --card: rgba(255, 255, 255, 0.02);
+    --card-foreground: #F8F9FA;
+    --popover: #050609;
+    --popover-foreground: #F8F9FA;
+    --primary: #F27D26;
+    --primary-foreground: #000000;
+    --secondary: rgba(255, 255, 255, 0.04);
+    --secondary-foreground: #F8F9FA;
+    --muted: rgba(255, 255, 255, 0.04);
+    --muted-foreground: #94A3B8;
+    --accent: rgba(242, 125, 38, 0.1);
+    --accent-foreground: #F27D26;
+    --destructive: #ef4444;
+    --border: rgba(255, 255, 255, 0.06);
+    --input: rgba(255, 255, 255, 0.06);
+    --ring: #F27D26;
+    --radius: 1rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    }
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-color: var(--background);
+    }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: 
+    radial-gradient(circle at 80% 10%, rgba(242, 125, 38, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 10% 90%, rgba(30, 60, 114, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.5) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.atmosphere::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+  opacity: 0.03;
+  filter: contrast(150%) brightness(100%);
+  pointer-events: none;
+}
+
+.glass {
+  @apply bg-card backdrop-blur-2xl border border-white/5 shadow-2xl;
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.6);
+  @apply backdrop-blur-3xl border border-white/5;
+}
+
+.shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent 45%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 55%
+  );
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translate(-30%, -30%); }
+  100% { transform: translate(30%, 30%); }
+}
+
+@keyframes shimmer-move {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.animate-shimmer {
+  animation: shimmer-move 2s infinite;
+}
+
+.card-glow {
+  position: relative;
+}
+
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(45deg, var(--primary), transparent, var(--primary));
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-glow:hover::before {
+  opacity: 0.2;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(242, 125, 38, 0.2);
+}
+
+/* React Flow Theming */
+.react-flow__node {
+  @apply !bg-[#0F1117] !border-[#F27D26]/50 !text-white !rounded-2xl !px-6 !py-3 !shadow-[0_0_30px_rgba(242,125,38,0.1)] !backdrop-blur-md;
+  border-width: 1px !important;
+}
+
+.react-flow__node.input {
+  @apply !bg-[#F27D26] !text-black !font-bold !shadow-[0_0_50px_rgba(242,125,38,0.3)];
+}
+
+.react-flow__edge-path {
+  @apply !stroke-[#F27D26] !stroke-[2px] !opacity-20;
+}
+
+.react-flow__controls {
+  @apply !bg-black/60 !backdrop-blur-xl !border-white/5 !rounded-2xl !shadow-2xl;
+}
+
+.react-flow__controls-button {
+  @apply !bg-transparent !border-white/5 !fill-white hover:!bg-white/10 transition-colors;
+}

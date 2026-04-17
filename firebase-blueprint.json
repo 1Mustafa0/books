@@ -1,0 +1,60 @@
+{
+  "entities": {
+    "Book": {
+      "title": "Book",
+      "description": "A book that the user is reading.",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "description": "The title of the book." },
+        "author": { "type": "string", "description": "The author of the book." },
+        "coverUrl": { "type": "string", "description": "URL to the book cover image." },
+        "totalChapters": { "type": "number", "description": "Total number of chapters in the book." },
+        "userId": { "type": "string", "description": "The ID of the user who owns this book." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the book was added." }
+      },
+      "required": ["title", "userId", "createdAt"]
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "A chapter within a book.",
+      "type": "object",
+      "properties": {
+        "bookId": { "type": "string", "description": "The ID of the book this chapter belongs to." },
+        "title": { "type": "string", "description": "The title of the chapter." },
+        "mindMap": { "type": "string", "description": "JSON string of the mind map data." },
+        "userId": { "type": "string", "description": "The ID of the user who owns this chapter." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "When the chapter was added." }
+      },
+      "required": ["bookId", "title", "userId", "createdAt"]
+    },
+    "Review": {
+      "title": "Review",
+      "description": "Spaced repetition review data for a chapter.",
+      "type": "object",
+      "properties": {
+        "chapterId": { "type": "string", "description": "The ID of the chapter being reviewed." },
+        "userId": { "type": "string", "description": "The ID of the user." },
+        "nextReviewDate": { "type": "string", "format": "date-time", "description": "The next scheduled review date." },
+        "interval": { "type": "number", "description": "The current interval in days." },
+        "easeFactor": { "type": "number", "description": "The ease factor for the SM-2 algorithm." },
+        "lastReviewedAt": { "type": "string", "format": "date-time", "description": "When the chapter was last reviewed." },
+        "status": { "type": "string", "enum": ["new", "learning", "review"], "description": "The current status of the review." }
+      },
+      "required": ["chapterId", "userId", "nextReviewDate", "interval", "easeFactor"]
+    }
+  },
+  "firestore": {
+    "/books/{bookId}": {
+      "schema": "Book",
+      "description": "Collection of books."
+    },
+    "/chapters/{chapterId}": {
+      "schema": "Chapter",
+      "description": "Collection of chapters."
+    },
+    "/reviews/{reviewId}": {
+      "schema": "Review",
+      "description": "Collection of review sessions."
+    }
+  }
+}
